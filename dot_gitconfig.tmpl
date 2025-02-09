@@ -1,0 +1,20 @@
+[credential]
+	helper = osxkeychain
+{{ if eq .chezmoi.hostname "treehopper" }}
+[include]
+	path = ~/.gitconfig-personal
+{{ else }}
+[user]
+	name = Miles Phillips
+	email = miles.phillips@perspectum.com
+[includeIf "gitdir:~/.personal/code/"]
+	path = ~/.gitconfig-personal
+{{ end }}
+[core]
+	editor = cursor --wait
+[init]
+	defaultBranch = main
+[push]
+	autoSetupRemote = true
+[merge]
+	tool = cursor

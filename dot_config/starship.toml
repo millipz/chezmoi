@@ -15,6 +15,7 @@ $username\
 $character"""
 
 right_format = """
+${env_var.AWS_VAULT}\
 $singularity\
 $kubernetes\
 $directory\
@@ -316,3 +317,9 @@ unknown_msg = '[◌](bold dimmed ellow)'
 [spack]
 symbol = "◇ "
 format = " spack [$symbol$environment]($style)"
+
+[env_var.AWS_VAULT]
+variable = "AWS_VAULT"
+format = "[$env_value]($style) "
+style = "bold cyan"
+
