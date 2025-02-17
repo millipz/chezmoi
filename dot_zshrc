@@ -80,11 +80,26 @@ export PATH="/opt/homebrew/opt/trash/bin:$PATH"
 # Bracketed paste
 zstyle ':bracketed-paste-magic' active-widgets '.self-*'
 
+mktouch() {
+    if [ $# -eq 0 ]; then
+        echo "Usage: mktouch <file>"
+        return 1
+    fi
+
+    local file="$1"
+    mkdir -p "$(dirname "$file")"
+    if [ ! -e "$file" ]; then
+        touch "$file"
+    fi
+}
+
 # Aliases
 # Add your aliases here, for example:
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
+alias v="vi"
+alias touch="mktouch"
 alias zshconfig="code ~/.zshrc"
 alias ohmyzsh="code ~/.oh-my-zsh"
 alias update="brew update && brew upgrade"

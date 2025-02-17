@@ -1,6 +1,6 @@
 [credential]
 	helper = osxkeychain
-{{ if eq .chezmoi.hostname "treehopper" }}
+{{ if eq .machine "home" }}
 [include]
 	path = ~/.gitconfig-personal
 {{ else }}
@@ -12,6 +12,8 @@
 {{ end }}
 [core]
 	editor = cursor --wait
+[sequence]
+	editor = cursor
 [init]
 	defaultBranch = main
 [push]
