@@ -1,0 +1,21 @@
+# Hammerspoon config files containing sensitive information
+config.lua
+.env
+*.env
+.env.local
+
+# General
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Lua
+*.o
+*.so
+*.dylib
+
+# IDE/Editor
+.vscode/
+.idea/
+*.swp
+*.swo 

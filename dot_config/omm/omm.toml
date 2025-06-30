@@ -1,0 +1,9 @@
+  db_path                 = "~/.local/share/omm/omm-w.db"
+  tl_color                = "#b8bb26"
+  atl_color               = "#fabd2f"
+  title                   = "work"
+  list_density            = "compact"
+  show_context            = false
+  editor                  = "vi -u NONE"
+  confirm_before_deletion = false
+  circular_nav            = true

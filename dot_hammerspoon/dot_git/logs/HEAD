@@ -1,0 +1,2 @@
+0000000000000000000000000000000000000000 55efd6ef111db67ea7ca3d83e6b13e0984b668a6 Miles Phillips <miles.phillips@perspectum.com> 1740136256 +0000	commit (initial): [IMP] Initial Commit
+55efd6ef111db67ea7ca3d83e6b13e0984b668a6 386058122a14a75d951f3e0a0b97b37e493738f7 Miles Phillips <miles.phillips@perspectum.com> 1740136604 +0000	commit: [IMP] change jira menu to copy ticket ref by default. Alt-click will go to ticket page
