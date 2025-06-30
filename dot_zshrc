@@ -1,136 +1,199 @@
-# pyenv setup
-export PYENV_ROOT="$HOME/.pyenv"
-[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
-eval "$(pyenv init -)"
+# Enable profiling (uncomment to debug startup time)
+# zmodload zsh/zprof
 
-DISABLE_AUTO_TITLE="true"
+# Fix insecure directory permissions before Oh My Zsh loads
+ZSH_DISABLE_COMPFIX="true"
 
-# Disable Oh My Zsh themes to prevent prompt setting
-PROMPT=""
-RPROMPT=""
-
-# Path to your Oh My Zsh installation
+# Path to Oh My Zsh installation
 export ZSH="$HOME/.oh-my-zsh"
 
-# Theme
-# ZSH_THEME="agnoster"
+# Disable auto-setting terminal title
+DISABLE_AUTO_TITLE="true"
 
-# Autosuggestions configuration
-ZSH_AUTOSUGGEST_STRATEGY=(history completion)
-ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=#999'
-
-# Completion settings
-ENABLE_CORRECTION="true"
+# Performance optimizations
+DISABLE_UNTRACKED_FILES_DIRTY="true"
 COMPLETION_WAITING_DOTS="true"
+ENABLE_CORRECTION="false"
 
-# Load compinit
-autoload -Uz compinit
-compinit
+# Disable spelling correction
+unsetopt correct
+unsetopt correct_all
 
-# Plugins
+# Plugins (load only what you need)
 plugins=(
     git
     macos
-    pyenv
     docker
     kubectl
-    npm
-    python
-    pip
-    virtualenv
-    zsh-aws-vault
     fzf
     fzf-tab
     zsh-autosuggestions
     zsh-syntax-highlighting
 )
 
-# Oh My Zsh
+# Load Oh My Zsh
 source $ZSH/oh-my-zsh.sh
 
-# fzf-tab configuration
-zstyle ':completion:*:descriptions' format '[%d]'
-zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
-zstyle ':completion:*' menu no
-zstyle ':fzf-tab:complete:cd:*' fzf-preview 'lsd -1 --color=always $realpath'
-zstyle ':fzf-tab:*' fzf-flags --color=fg:1,fg+:2 --bind=tab:accept
-zstyle ':fzf-tab:*' switch-group '<' '>'
+# Initialize completions once (remove duplicate calls)
+autoload -Uz compinit
+# Optimize completion loading - only regenerate once per day
+if [[ -n ${ZDOTDIR:-$HOME}/.zcompdump(#qNmh+24) ]]; then
+    compinit
+else
+    compinit -C
+fi
 
+# Environment setup
+# ==================
 
-# User configuration
-# Uncomment and modify these as needed
-# export LANG=en_US.UTF-8
-# export EDITOR='nvim'
-# export ARCHFLAGS="-arch $(uname -m)"
+# Pyenv
+export PYENV_ROOT="$HOME/.pyenv"
+[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
+command -v pyenv >/dev/null && eval "$(pyenv init -)"
 
 # NVM (Node Version Manager)
 export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" --no-use  # --no-use for faster startup
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
 
-# PostgreSQL
+# Conda
+__conda_setup="$('/opt/homebrew/Caskroom/miniconda/base/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
+if [ $? -eq 0 ]; then
+    eval "$__conda_setup"
+else
+    if [ -f "/opt/homebrew/Caskroom/miniconda/base/etc/profile.d/conda.sh" ]; then
+        . "/opt/homebrew/Caskroom/miniconda/base/etc/profile.d/conda.sh"
+    else
+        export PATH="/opt/homebrew/Caskroom/miniconda/base/bin:$PATH"
+    fi
+fi
+unset __conda_setup
+
+# Path additions
 export PATH="/opt/homebrew/opt/postgresql@15/bin:$PATH"
-
-# Local Python tools
 export PATH="$HOME/.local/bin:$PATH"
-
-# Trash
 export PATH="/opt/homebrew/opt/trash/bin:$PATH"
+export PATH="/opt/homebrew/opt/llvm/bin:$PATH"
 
-# Bracketed paste
-zstyle ':bracketed-paste-magic' active-widgets '.self-*'
+# Clang-tidy
+export CLANG_TIDY_DIR=~/tools/clang-tidy
+export PATH="$CLANG_TIDY_DIR/bin:$CLANG_TIDY_DIR:$PATH"
+export LD_LIBRARY_PATH="$CLANG_TIDY_DIR/lib:$LD_LIBRARY_PATH"
+
+# FZF-tab configuration
+zstyle ':completion:*:descriptions' format '[%d]'
+zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
+zstyle ':completion:*' menu no
+zstyle ':fzf-tab:complete:cd:*' fzf-preview 'lsd -1 --color=always $realpath 2>/dev/null || ls -la'
+zstyle ':fzf-tab:*' fzf-flags --color=fg:1,fg+:2 --bind=tab:accept
+zstyle ':fzf-tab:*' switch-group '<' '>'
+
+# Autosuggestions configuration
+ZSH_AUTOSUGGEST_STRATEGY=(history completion)
+ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=#999'
+
+# Colors
+export CLICOLOR=1
+export LSCOLORS=ExFxBxDxCxegedabagacad
+
+# Functions
+# ==================
 
 mktouch() {
     if [ $# -eq 0 ]; then
         echo "Usage: mktouch <file>"
         return 1
     fi
-
+    
     local file="$1"
-    mkdir -p "$(dirname "$file")"
-    if [ ! -e "$file" ]; then
-        touch "$file"
-    fi
+    mkdir -p "$(dirname "$file")" && touch "$file"
 }
 
 # Aliases
-# Add your aliases here, for example:
-# alias zshconfig="mate ~/.zshrc"
-# alias ohmyzsh="mate ~/.oh-my-zsh"
+# ==================
 
+# Editor
 alias v="vi"
+alias nv="nvim"
+alias vf='nvim $(fzf)'
+
+# File operations
 alias touch="mktouch"
-alias zshconfig="code ~/.zshrc"
-alias ohmyzsh="code ~/.oh-my-zsh"
-alias update="brew update && brew upgrade"
-alias c="clear"
-alias ll="ls -la"
-alias python="python3"
-alias pip="pip3"
-alias gs="git status"
-alias gc="git commit"
-alias gp="git push"
-alias dk="docker"
-alias dkc="docker-compose"
+alias ll="ls -lah"
 alias ls="lsd"
 alias cat="bat"
-alias awsconfig="vim ~/.aws/config"
-alias pdt="pd-timelog start"
-alias pdts="pd-timelog stop"
-alias pdtx="pd-timelog drop"
 alias rm="echo Use 'trash', or the full path i.e. '/bin/rm'"
 
-# Colorize ls output
-export CLICOLOR=1
-export LSCOLORS=ExFxBxDxCxegedabagacad
+# Navigation
+alias ..="cd .."
+alias ...="cd ../.."
+alias ~="cd ~"
+alias f="fzf"
 
+# Git
+alias gs="git status"
+alias gc="git commit"
+alias gps="git push"
+alias gpl="git pull"
+alias lg="lazygit"
+alias gdc="git diff development | pbcopy"
 
-# Additional PATH modifications
-# Add any other PATH modifications here, for example:
-# export PATH=$HOME/bin:$HOME/.local/bin:/usr/local/bin:$PATH
+# Docker
+alias dk="docker"
+alias dkc="docker-compose"
 
-# Starship prompt
-eval "$(starship init zsh)"
+# AWS Vault
+alias ave="aws-vault exec"
+alias avl="aws-vault login"
 
-# zoxide
-eval "$(zoxide init zsh)"
+# Python
+alias python="python3"
+alias pip="pip3"
+
+# Config files
+alias zshconfig="nv ~/.zshrc"
+alias gitconfig="nv ~/.gitconfig"
+alias awsconfig="nv ~/.aws/config"
+
+# System
+alias update="brew update && brew upgrade"
+alias c="clear"
+alias ff="fastfetch"
+alias cr="cursor"
+
+# Initialize tools (at the end for faster startup)
+# ==================
+
+# Zoxide (better cd)
+command -v zoxide >/dev/null && eval "$(zoxide init zsh)"
+
+# Starship prompt - MUST come before tmux launch
+command -v starship >/dev/null && eval "$(starship init zsh)"
+
+# Tmux auto-launch (MUST BE LAST!)
+# ==================
+# Launch tmux automatically if:
+# - tmux is installed
+# - we're in an interactive shell
+# - we're not already in tmux
+# - we're not in VS Code terminal
+# - we're in a SSH session (optional - uncomment the SSH check if desired)
+
+if command -v tmux &> /dev/null && \
+   [ -n "$PS1" ] && \
+   [[ ! "$TERM" =~ screen ]] && \
+   [[ ! "$TERM" =~ tmux ]] && \
+   [ -z "$TMUX" ] && \
+   [ "$TERM_PROGRAM" != "vscode" ]; then
+   # && [ -n "$SSH_CLIENT" ] || [ -n "$SSH_TTY" ]; then  # Uncomment for SSH only
+   
+   # Create a default session if none exists
+   tmux has-session -t main 2>/dev/null || tmux new-session -d -s main
+   
+   # Attach to the main session
+   exec tmux attach-session -t main
+fi
+
+# Profiling (uncomment to see startup time breakdown)
+# zprofexport KALEIDOSCOPE_DIR=/Users/milesphillips/git/Kaleidoscope
+export PATH="/opt/homebrew/opt/mysql-client/bin:$PATH"

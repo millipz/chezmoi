@@ -1,6 +1,4 @@
-
-# You can preview the config here
- 
+font-thicken = true
 clipboard-read = allow
 clipboard-write = allow
 copy-on-select = true
@@ -31,3 +29,6 @@ palette = 15=#888f94
 font-family = Iosevka NFM
 keybind = global:cmd+§=toggle_quick_terminal
 macos-titlebar-style = hidden
+macos-option-as-alt = true
+keybind = alt+left=unbind
+keybind = alt+right=unbind

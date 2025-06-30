@@ -1,8 +1,11 @@
+# Optimized Starship Configuration
 # version: 1.0.0
 
 add_newline = false
 continuation_prompt = "[▸▹ ](dimmed white)"
+command_timeout = 3000  # Increased from 2000 for slower git operations
 
+# Simplified format - moved most language modules out of right_format
 format = """($nix_shell$container$fill$git_metrics\n)$cmd_duration\
 $hostname\
 $localip\
@@ -14,74 +17,18 @@ $sudo\
 $username\
 $character"""
 
+# Only show actively used modules in right prompt
 right_format = """
 ${env_var.AWS_VAULT}\
-$singularity\
-$kubernetes\
 $directory\
-$vcsh\
-$fossil_branch\
 $git_branch\
 $git_commit\
 $git_state\
 $git_status\
-$hg_branch\
-$pijul_channel\
+$python\
+$nodejs\
 $docker_context\
 $package\
-$c\
-$cmake\
-$cobol\
-$daml\
-$dart\
-$deno\
-$dotnet\
-$elixir\
-$elm\
-$erlang\
-$fennel\
-$golang\
-$guix_shell\
-$haskell\
-$haxe\
-$helm\
-$java\
-$julia\
-$kotlin\
-$gradle\
-$lua\
-$nim\
-$nodejs\
-$ocaml\
-$opa\
-$perl\
-$php\
-$pulumi\
-$purescript\
-$python\
-$raku\
-$rlang\
-$red\
-$ruby\
-$rust\
-$scala\
-$solidity\
-$swift\
-$terraform\
-$vlang\
-$vagrant\
-$zig\
-$buf\
-$conda\
-$meson\
-$spack\
-$memory_usage\
-$aws\
-$gcloud\
-$openstack\
-$azure\
-$crystal\
-$custom\
 $status\
 $os\
 $battery\
@@ -95,7 +42,6 @@ format = "$symbol "
 success_symbol = "[◎](bold italic bright-yellow)"
 error_symbol = "[○](italic purple)"
 vimcmd_symbol = "[■](italic dimmed green)"
-# not supported in zsh
 vimcmd_replace_one_symbol = "◌"
 vimcmd_replace_symbol = "□"
 vimcmd_visual_symbol = "▼"
@@ -130,6 +76,7 @@ repo_root_format = '[$before_root_path]($before_repo_root_style)[$repo_root]($re
 
 [cmd_duration]
 format = "[◄ $duration ](italic white)"
+min_time = 10_000  # Only show for commands longer than 10s
 
 [jobs]
 format = "[$symbol$number]($style) "
@@ -168,6 +115,7 @@ style = "italic dimmed bright-purple"
 threshold = 70
 style = "italic dimmed yellow"
 
+# Git Performance Optimizations
 [git_branch]
 format = " [$branch(:$remote_branch)]($style)"
 symbol = "[△](bold italic bright-blue)"
@@ -182,7 +130,7 @@ format = '([▴$added]($added_style))([▿$deleted]($deleted_style))'
 added_style = 'italic dimmed green'
 deleted_style = 'italic dimmed red'
 ignore_submodules = true
-disabled = false
+disabled = true  # DISABLED for performance - enable only when needed
 
 [git_status]
 style = "bold italic bright-blue"
@@ -197,24 +145,12 @@ modified = "[●◦](italic yellow)"
 staged = "[▪┤[$count](bold white)│](italic bright-cyan)"
 renamed = "[◎◦](italic bright-blue)"
 deleted = "[✕](italic red)"
+# Performance: ignore slow directories
+ignore_submodules = true
+# Disable in large repos by adding paths:
+# disabled_dirs = ["/path/to/large/repo"]
 
-[deno]
-format = " [deno](italic) [∫ $version](green bold)"
-version_format = "${raw}"
-
-[lua]
-format = " [lua](italic) [${symbol}${version}]($style)"
-version_format = "${raw}"
-symbol = "⨀ "
-style = "bold bright-yellow"
-
-[nodejs]
-format = " [node](italic) [◫ ($version)](bold bright-green)"
-version_format = "${raw}"
-detect_files = ["package-lock.json", "yarn.lock"]
-detect_folders = ["node_modules"]
-detect_extensions = []
-
+# Language modules - only enable what you actively use
 [python]
 format = " [py](italic) [${symbol}${pyenv_prefix}(${version} )(\\($virtualenv\\) )]($style)"
 symbol = "[⌉](bold bright-blue)⌊ "
@@ -222,89 +158,172 @@ version_format = "${raw}"
 style = "bold bright-yellow"
 pyenv_version_name = true
 detect_extensions = ["py"]
-python_binary = ["python", "python3", "python2"]
+python_binary = ["python3"]  # Faster - only check python3
 
-[ruby]
-format = " [rb](italic) [${symbol}${version}]($style)"
-symbol = "◆ "
+[nodejs]
+format = " [node](italic) [◫ ($version)](bold bright-green)"
 version_format = "${raw}"
-style = "bold red"
+detect_files = ["package.json"]  # Faster than checking lock files
+detect_folders = []  # Don't check node_modules
+detect_extensions = []
 
-[rust]
-format = " [rs](italic) [$symbol$version]($style)"
-symbol = "⊃ "
-version_format = "${raw}"
-style = "bold red"
+[docker_context]
+symbol = "◧ "
+format = " docker [$symbol$context]($style)"
+only_with_files = true  # Only show when docker files present
+detect_files = ["docker-compose.yml", "docker-compose.yaml", "Dockerfile"]
 
 [package]
 format = " [pkg](italic dimmed) [$symbol$version]($style)"
 version_format = "${raw}"
 symbol = "◨ "
 style = "dimmed yellow italic bold"
+disabled = false  # Set to true if you don't need package version
 
-[swift]
-format = " [sw](italic) [${symbol}${version}]($style)"
-symbol = "◁ "
-style = "bold bright-red"
-version_format = "${raw}"
-
+# Disabled modules for performance (uncomment to enable as needed)
 [aws]
 disabled = true
-format = " [aws](italic) [$symbol $profile $region]($style)"
-style = "bold blue"
-symbol = "▲ "
 
-[buf]
-symbol = "■ "
-format = " [buf](italic) [$symbol $version $buf_version]($style)"
+[azure]
+disabled = true
+
+[gcloud]
+disabled = true
+
+[kubernetes]
+disabled = true
+
+# Language modules - disabled by default for performance
+# Uncomment only the ones you actively use
 
 [c]
-symbol = "ℂ "
-format = " [$symbol($version(-$name))]($style)"
+disabled = true
+
+[cmake]
+disabled = true
+
+[cobol]
+disabled = true
 
 [conda]
-symbol = "◯ "
-format = " conda [$symbol$environment]($style)"
+disabled = true
+
+[crystal]
+disabled = true
+
+[daml]
+disabled = true
 
 [dart]
-symbol = "◁◅ "
-format = " dart [$symbol($version )]($style)"
+disabled = true
 
-[docker_context]
-symbol = "◧ "
-format = " docker [$symbol$context]($style)"
+[deno]
+disabled = true
+
+[dotnet]
+disabled = true
 
 [elixir]
-symbol = "△ "
-format = " exs [$symbol $version OTP $otp_version ]($style)"
+disabled = true
 
 [elm]
-symbol = "◩ "
-format = " elm [$symbol($version )]($style)"
+disabled = true
+
+[erlang]
+disabled = true
+
+[fennel]
+disabled = true
 
 [golang]
-symbol = "∩ "
-format = " go [$symbol($version )]($style)"
+disabled = true
+
+[gradle]
+disabled = true
 
 [haskell]
-symbol = "❯λ "
-format = " hs [$symbol($version )]($style)"
+disabled = true
+
+[haxe]
+disabled = true
+
+[helm]
+disabled = true
 
 [java]
-symbol = "∪ "
-format = " java [${symbol}(${version} )]($style)"
+disabled = true
 
 [julia]
-symbol = "◎ "
-format = " jl [$symbol($version )]($style)"
+disabled = true
 
-[memory_usage]
-symbol = "▪▫▪ "
-format = " mem [${ram}( ${swap})]($style)"
+[kotlin]
+disabled = true
+
+[lua]
+disabled = true
 
 [nim]
-symbol = "▴▲▴ "
-format = " nim [$symbol($version )]($style)"
+disabled = true
+
+[ocaml]
+disabled = true
+
+[opa]
+disabled = true
+
+[perl]
+disabled = true
+
+[php]
+disabled = true
+
+[pulumi]
+disabled = true
+
+[purescript]
+disabled = true
+
+[raku]
+disabled = true
+
+[red]
+disabled = true
+
+[rlang]
+disabled = true
+
+[ruby]
+disabled = true
+
+[rust]
+disabled = true
+
+[scala]
+disabled = true
+
+[solidity]
+disabled = true
+
+[swift]
+disabled = true
+
+[terraform]
+disabled = true
+
+[vagrant]
+disabled = true
+
+[vlang]
+disabled = true
+
+[zig]
+disabled = true
+
+[buf]
+disabled = true
+
+[guix_shell]
+disabled = true
 
 [nix_shell]
 style = 'bold italic dimmed blue'
@@ -314,12 +333,7 @@ impure_msg = '[⌽](bold dimmed red)'
 pure_msg = '[⌾](bold dimmed green)'
 unknown_msg = '[◌](bold dimmed ellow)'
 
-[spack]
-symbol = "◇ "
-format = " spack [$symbol$environment]($style)"
-
 [env_var.AWS_VAULT]
 variable = "AWS_VAULT"
 format = "[$env_value]($style) "
 style = "bold cyan"
-
