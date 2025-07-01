@@ -163,18 +163,28 @@ choose_environment() {
     echo
 }
 
+# Create chezmoi config
+create_chezmoi_config() {
+    print_step "Creating chezmoi configuration..."
+    
+    mkdir -p "$HOME/.config/chezmoi"
+    cat > "$HOME/.config/chezmoi/chezmoi.toml" <<EOF
+[data]
+    machine = "$CHEZMOI_ENV"
+EOF
+    
+    print_success "chezmoi config created with machine = $CHEZMOI_ENV"
+}
+
 # Initialize chezmoi with your dotfiles
 init_chezmoi() {
     print_step "Initializing chezmoi with your dotfiles..."
-    
-    # Set the template variable for chezmoi
-    export CHEZMOI_MACHINE="$CHEZMOI_ENV"
     
     if [ ! -d "$HOME/.local/share/chezmoi" ]; then
         chezmoi init --apply https://github.com/millipz/chezmoi.git
     else
         print_warning "chezmoi already initialized, updating..."
-        chezmoi update --apply
+        chezmoi apply
     fi
     
     print_success "chezmoi initialization complete"
@@ -197,9 +207,34 @@ install_brew_packages() {
     print_success "Homebrew packages installed"
 }
 
+# Run any post-install scripts from chezmoi
+run_post_install_scripts() {
+    print_step "Checking for chezmoi run scripts..."
+    
+    # chezmoi handles run scripts automatically during apply
+    # But we can check if any exist and inform the user
+    local chezmoi_dir="$HOME/.local/share/chezmoi"
+    
+    if [ -d "$chezmoi_dir" ]; then
+        local run_scripts_found=false
+        for script in "$chezmoi_dir"/run_*; do
+            if [ -f "$script" ]; then
+                run_scripts_found=true
+                print_step "Found run script: $(basename "$script")"
+            fi
+        done
+        
+        if [ "$run_scripts_found" = true ]; then
+            print_success "chezmoi run scripts will execute automatically"
+        else
+            print_step "No run scripts found"
+        fi
+    fi
+}
+
 # Final steps
 finish_setup() {
-    print_success "Boomstrap complete! 🎉"
+    print_success "Bootstrap complete! 🎉"
     echo
     print_step "Next steps:"
     echo "1. Restart your terminal to load new shell configuration"
@@ -222,6 +257,7 @@ main() {
     setup_brew_path
     install_chezmoi
     choose_environment
+    create_chezmoi_config
     init_chezmoi
     install_brew_packages
     run_post_install_scripts
