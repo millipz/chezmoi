@@ -117,52 +117,22 @@ install_chezmoi() {
     fi
 }
 
-# Setup GitHub authentication (optional for private repos)
-setup_github_auth() {
-    print_step "Checking GitHub access..."
-    
-    # Test if we can access the repo without auth (public repo)
-    if curl -fsSL https://raw.githubusercontent.com/millipz/chezmoi/main/README.md &>/dev/null; then
-        print_success "Public repo access confirmed - no GitHub auth needed"
-        return 0
-    fi
-    
-    print_warning "Repository appears to be private, setting up GitHub authentication..."
-    
-    # Install GitHub CLI if not present
-    if ! command -v gh &>/dev/null; then
-        print_step "Installing GitHub CLI..."
-        brew install gh
-    fi
-    
-    # Check if already authenticated
-    if gh auth status &>/dev/null; then
-        print_success "Already authenticated with GitHub"
-        return 0
-    fi
-    
-    print_step "Please authenticate with GitHub..."
-    print_warning "This will open your browser for GitHub authentication"
-    
-    # Authenticate with GitHub (will handle the login flow)
-    if ! gh auth login --git-protocol https --web; then
-        print_error "GitHub authentication failed"
-        exit 1
-    fi
-    
-    print_success "GitHub authentication complete"
-}
+# No GitHub authentication needed for public repos
 
 # Prompt for work or home setup
 choose_environment() {
     echo
+    echo "============================================"
     print_step "Choose your environment setup:"
+    echo "============================================"
     echo "1) Home"
     echo "2) Work"
+    echo "============================================"
     echo
     
     while true; do
-        read -p "Enter choice (1 or 2): " choice
+        printf "Enter choice (1 or 2): "
+        read choice
         case $choice in
             1) 
                 CHEZMOI_ENV="home"
@@ -265,7 +235,6 @@ main() {
     install_homebrew
     setup_brew_path
     install_chezmoi
-    setup_github_auth
     choose_environment
     init_chezmoi
     install_brew_packages
