@@ -117,9 +117,17 @@ install_chezmoi() {
     fi
 }
 
-# Setup GitHub authentication
+# Setup GitHub authentication (optional for private repos)
 setup_github_auth() {
-    print_step "Setting up GitHub authentication..."
+    print_step "Checking GitHub access..."
+    
+    # Test if we can access the repo without auth (public repo)
+    if curl -fsSL https://raw.githubusercontent.com/millipz/chezmoi/main/README.md &>/dev/null; then
+        print_success "Public repo access confirmed - no GitHub auth needed"
+        return 0
+    fi
+    
+    print_warning "Repository appears to be private, setting up GitHub authentication..."
     
     # Install GitHub CLI if not present
     if ! command -v gh &>/dev/null; then
@@ -147,9 +155,11 @@ setup_github_auth() {
 
 # Prompt for work or home setup
 choose_environment() {
+    echo
     print_step "Choose your environment setup:"
     echo "1) Home"
     echo "2) Work"
+    echo
     
     while true; do
         read -p "Enter choice (1 or 2): " choice
@@ -169,6 +179,7 @@ choose_environment() {
     done
     
     print_success "Environment set to: $CHEZMOI_ENV"
+    echo
 }
 
 # Initialize chezmoi with your dotfiles
@@ -207,22 +218,27 @@ install_brew_packages() {
 
 # Run any post-install scripts from chezmoi
 run_post_install_scripts() {
-    print_step "Running post-install scripts..."
+    print_step "Checking for chezmoi run scripts..."
     
-    # chezmoi run scripts are typically in ~/.local/share/chezmoi/run_*
+    # chezmoi handles run scripts automatically during apply
+    # But we can check if any exist and inform the user
     local chezmoi_dir="$HOME/.local/share/chezmoi"
     
     if [ -d "$chezmoi_dir" ]; then
-        # Look for executable run scripts
+        local run_scripts_found=false
         for script in "$chezmoi_dir"/run_*; do
-            if [ -x "$script" ]; then
-                print_step "Running $(basename "$script")..."
-                "$script" || print_warning "Script $(basename "$script") failed but continuing..."
+            if [ -f "$script" ]; then
+                run_scripts_found=true
+                print_step "Found run script: $(basename "$script")"
             fi
         done
+        
+        if [ "$run_scripts_found" = true ]; then
+            print_success "chezmoi run scripts will execute automatically"
+        else
+            print_step "No run scripts found"
+        fi
     fi
-    
-    print_success "Post-install scripts complete"
 }
 
 # Final steps
