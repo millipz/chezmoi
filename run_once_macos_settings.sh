@@ -73,7 +73,7 @@ echo "4. Menu Title: (leave blank)"
 echo "5. Keyboard Shortcut: Press ⌘⌥, (cmd-alt-comma)"
 echo "6. Click 'Add'"
 echo
-read -p "Press any key when you've completed the keyboard shortcut setup..." -n1 -s
+read -p "Press any key when you've completed the keyboard shortcut setup..." -n1 -s < /dev/tty
 echo
 print_success "Keyboard shortcut setup acknowledged"
 
@@ -85,7 +85,7 @@ echo "1. Open System Settings > Displays"
 echo "2. Select 'More Space' (this gives you the highest effective resolution)"
 echo "3. If you have multiple displays, repeat for each one"
 echo
-read -p "Press any key when you've set the display resolution..." -n1 -s
+read -p "Press any key when you've set the display resolution..." -n1 -s < /dev/tty
 echo
 print_success "Display resolution setup acknowledged"
 
