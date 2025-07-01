@@ -121,6 +121,17 @@ install_chezmoi() {
 
 # Prompt for work or home setup
 choose_environment() {
+    # Check if environment is already set via environment variable
+    if [[ -n "${MACHINE:-}" ]]; then
+        case "${MACHINE}" in
+            "home"|"work")
+                CHEZMOI_ENV="${MACHINE}"
+                print_success "Using environment from MACHINE variable: $CHEZMOI_ENV"
+                return 0
+                ;;
+        esac
+    fi
+    
     echo
     echo "============================================"
     print_step "Choose your environment setup:"
@@ -132,7 +143,7 @@ choose_environment() {
     
     while true; do
         printf "Enter choice (1 or 2): "
-        read choice
+        read choice < /dev/tty
         case $choice in
             1) 
                 CHEZMOI_ENV="home"
@@ -186,34 +197,9 @@ install_brew_packages() {
     print_success "Homebrew packages installed"
 }
 
-# Run any post-install scripts from chezmoi
-run_post_install_scripts() {
-    print_step "Checking for chezmoi run scripts..."
-    
-    # chezmoi handles run scripts automatically during apply
-    # But we can check if any exist and inform the user
-    local chezmoi_dir="$HOME/.local/share/chezmoi"
-    
-    if [ -d "$chezmoi_dir" ]; then
-        local run_scripts_found=false
-        for script in "$chezmoi_dir"/run_*; do
-            if [ -f "$script" ]; then
-                run_scripts_found=true
-                print_step "Found run script: $(basename "$script")"
-            fi
-        done
-        
-        if [ "$run_scripts_found" = true ]; then
-            print_success "chezmoi run scripts will execute automatically"
-        else
-            print_step "No run scripts found"
-        fi
-    fi
-}
-
 # Final steps
 finish_setup() {
-    print_success "Bootstrap complete! 🎉"
+    print_success "Boomstrap complete! 🎉"
     echo
     print_step "Next steps:"
     echo "1. Restart your terminal to load new shell configuration"
