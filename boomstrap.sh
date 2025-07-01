@@ -26,6 +26,13 @@ print_error() {
     echo -e "${RED}❌ $1${NC}"
 }
 
+# Detect if script is being piped
+if [ -t 0 ]; then
+    INTERACTIVE=true
+else
+    INTERACTIVE=false
+fi
+
 # Ask for admin password upfront
 print_step "Requesting administrator privileges..."
 sudo -v
@@ -42,7 +49,11 @@ install_xcode_tools() {
         
         # Wait for installation to complete
         print_warning "Please complete the Xcode Command Line Tools installation in the dialog, then press any key to continue..."
-        read -n 1 -s
+        if [ "$INTERACTIVE" = true ]; then
+            read -n 1 -s
+        else
+            read -n 1 -s < /dev/tty
+        fi
         
         # Verify installation
         if ! xcode-select -p &>/dev/null; then
@@ -117,7 +128,27 @@ install_chezmoi() {
     fi
 }
 
-# No GitHub authentication needed for public repos
+# Setup GitHub authentication if needed
+setup_github_auth() {
+    print_step "Setting up GitHub authentication..."
+    
+    # Install GitHub CLI if not present
+    if ! command -v gh &>/dev/null; then
+        print_step "Installing GitHub CLI..."
+        brew install gh
+    fi
+    
+    # Check if already authenticated
+    if gh auth status &>/dev/null; then
+        print_success "Already authenticated with GitHub"
+    else
+        print_step "Please authenticate with GitHub..."
+        print_warning "This will open your browser for GitHub authentication"
+        echo
+        gh auth login -h github.com -p https -w
+        print_success "GitHub authentication complete"
+    fi
+}
 
 # Prompt for work or home setup
 choose_environment() {
@@ -143,7 +174,11 @@ choose_environment() {
     
     while true; do
         printf "Enter choice (1 or 2): "
-        read choice < /dev/tty
+        if [ "$INTERACTIVE" = true ]; then
+            read choice
+        else
+            read choice < /dev/tty
+        fi
         case $choice in
             1) 
                 CHEZMOI_ENV="home"
@@ -167,6 +202,10 @@ choose_environment() {
 create_chezmoi_config() {
     print_step "Creating chezmoi configuration..."
     
+    # Remove any existing config files to avoid conflicts
+    rm -f "$HOME/.config/chezmoi/chezmoi.yaml" 2>/dev/null || true
+    rm -f "$HOME/.config/chezmoi/chezmoi.toml" 2>/dev/null || true
+    
     mkdir -p "$HOME/.config/chezmoi"
     cat > "$HOME/.config/chezmoi/chezmoi.toml" <<EOF
 [data]
@@ -184,7 +223,7 @@ init_chezmoi() {
         chezmoi init --apply https://github.com/millipz/chezmoi.git
     else
         print_warning "chezmoi already initialized, updating..."
-        chezmoi apply
+        chezmoi update --apply
     fi
     
     print_success "chezmoi initialization complete"
@@ -256,6 +295,7 @@ main() {
     install_homebrew
     setup_brew_path
     install_chezmoi
+    setup_github_auth
     choose_environment
     create_chezmoi_config
     init_chezmoi
