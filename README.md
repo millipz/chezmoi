@@ -7,7 +7,7 @@ Managed with [chezmoi](https://www.chezmoi.io/) for easy setup across multiple m
 Run this single command to bootstrap a new macOS machine:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/millipz/chezmoi/main/bootstrap.sh | bash
+curl -fsSL https://raw.githubusercontent.com/millipz/chezmoi/main/boomstrap.sh | bash
 ```
 
 This will:
