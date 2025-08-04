@@ -33,6 +33,39 @@ hs.hotkey.bind({"cmd", "alt", "ctrl"}, "J", function()
     jiraTicketMenu.refreshTickets()
 end)
 
+-- Plover toggle hotkey
+hs.hotkey.bind({"cmd", "ctrl", "alt"}, "P", function()
+    logger.debug("init", "Toggling Plover output")
+    
+    -- Save current focus
+    local currentApp = hs.application.frontmostApplication()
+    local currentWindow = currentApp:mainWindow()
+    
+    -- Find Plover application
+    local plover = hs.application.get("Plover")
+    if not plover then
+        logger.warn("init", "Plover not found")
+        hs.alert.show("Plover not found")
+        return
+    end
+    
+    -- Toggle Plover output directly without switching applications
+    local script = [[
+        tell application "System Events"
+            tell process "Plover"
+                click menu item "Toggle output" of menu "File" of menu bar 1
+            end tell
+        end tell
+    ]]
+    
+    local ok, result = hs.osascript.applescript(script)
+    if not ok then
+        logger.warn("init", "Failed to toggle Plover: " .. tostring(result))
+    else
+        logger.debug("init", "Plover toggled successfully")
+    end
+end)
+
 -- Routines
 logger.debug("init", "Setting up routines")
 hs.timer.doAt("09:00", "1d", function()
