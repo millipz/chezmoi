@@ -1,0 +1,8 @@
+# Backup files created by update_brewfile.sh
+*.backup.*
+*.bak
+*.tmp
+
+# Temporary files
+/tmp/current_brewfile_*
+/tmp/template_applied_* 

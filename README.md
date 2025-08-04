@@ -129,6 +129,15 @@ rm -rf ~/.local/share/chezmoi
 brew bundle --file="$HOME/Brewfile"
 ```
 
+### Update Brewfile from local installs
+```bash
+# Use the helper script to sync local installs with dotfiles
+brewfile
+
+# Or manually
+~/.local/share/chezmoi/scripts/update_brewfile.sh
+```
+
 ## 📦 Key Software Installed
 
 The Brewfile includes:

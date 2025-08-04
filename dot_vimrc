@@ -1,6 +1,75 @@
-" ~/.vimrc (optional helper)
-echo "⚠️  This machine uses Neovim + LazyVim. Launching nvim…"
-if executable('nvim')
-  silent exec '!nvim' | q
+" Basic Vim configuration
+" This provides basic functionality for vi/vim when Neovim isn't available
+
+" Enable syntax highlighting
+syntax on
+
+" Enable file type detection and indentation
+filetype plugin indent on
+
+" Set basic options
+set number
+set relativenumber
+set autoindent
+set smartindent
+set expandtab
+set tabstop=2
+set shiftwidth=2
+set softtabstop=2
+set smarttab
+set backspace=indent,eol,start
+set incsearch
+set hlsearch
+set ignorecase
+set smartcase
+set showmatch
+set ruler
+set wildmenu
+set wildmode=list:longest
+set title
+set visualbell
+set noerrorbells
+set nobackup
+set noswapfile
+set undodir=~/.vim/undodir
+set undofile
+set scrolloff=8
+set sidescrolloff=8
+set signcolumn=yes
+set colorcolumn=80
+
+" Set leader key
+let mapleader=" "
+
+" Basic key mappings
+nnoremap <leader>nh :nohl<CR>
+nnoremap <leader>w :w<CR>
+nnoremap <leader>q :q<CR>
+nnoremap <leader>wq :wq<CR>
+nnoremap <leader>qa :qa<CR>
+nnoremap <leader>wqa :wqa<CR>
+
+" Move between windows
+nnoremap <C-h> <C-w>h
+nnoremap <C-j> <C-w>j
+nnoremap <C-k> <C-w>k
+nnoremap <C-l> <C-w>l
+
+" Resize windows
+nnoremap <C-Up> <C-w>+
+nnoremap <C-Down> <C-w>-
+nnoremap <C-Left> <C-w><
+nnoremap <C-Right> <C-w>>
+
+" Colorscheme
+set background=dark
+if has('termguicolors')
+  set termguicolors
 endif
 
+" Try to use a colorscheme if available
+try
+  colorscheme desert
+catch
+  " Fallback to default
+endtry

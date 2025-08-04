@@ -315,6 +315,7 @@ alias update="brew update && brew upgrade"
 alias c="clear"
 alias ff="fastfetch"
 alias cr="cursor"
+alias brewfile="~/.local/share/chezmoi/scripts/update_brewfile.sh"
 
 # code2prompt
 alias c2p='code2prompt --hidden . --exclude="**/test/**" --exclude="**/tests/**"'
