@@ -66,6 +66,12 @@ hs.hotkey.bind({"cmd", "ctrl", "alt"}, "P", function()
     end
 end)
 
+-- Settings app hotkey
+hs.hotkey.bind({"cmd", "shift"}, ",", function()
+    logger.debug("init", "Opening Settings app")
+    hs.application.launchOrFocus("System Settings")
+end)
+
 -- Routines
 logger.debug("init", "Setting up routines")
 hs.timer.doAt("09:00", "1d", function()

@@ -143,6 +143,10 @@ case $choice in
             fi
         done
         
+        # clean up backup files
+        rm -f "$brewfile_template.bak"
+        rm -f "$brewfile_template.backup."*
+        
         print_success "Brewfile.tmpl updated!"
         print_step "Next steps:"
         echo "  1. Review the changes: chezmoi diff ~/Brewfile"
