@@ -362,7 +362,7 @@ if command -v tmux &> /dev/null && \
    tmux has-session -t main 2>/dev/null || tmux new-session -d -s main
    
    # Attach to the main session
-   exec tmux attach-session -t main
+   tmux attach-session -t main
 fi
 
 # Profiling (uncomment to see startup time breakdown)
