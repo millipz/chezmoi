@@ -1,0 +1,3 @@
+[submodule "dot_config/dot_config/StenoDictionaries"]
+	path = dot_config/dot_config/StenoDictionaries
+	url = https://github.com/millipz/StenoDictionaries.git
