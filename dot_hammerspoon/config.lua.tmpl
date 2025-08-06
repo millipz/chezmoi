@@ -3,6 +3,6 @@ return {
     jira = {
         domain = "perspectum.atlassian.net",
         email = "miles.phillips@perspectum.com",
-        api_token = "YOUR_API_TOKEN"
+        api_token = {{ .jira_api_token | quote }}
     }
 } 

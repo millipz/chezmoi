@@ -110,6 +110,23 @@ Sensitive data is managed using chezmoi's built-in features:
 - Encrypted files for secrets (if needed)
 - Integration with 1Password CLI (optional)
 
+### Jira API Token for Hammerspoon
+
+The Hammerspoon configuration includes a Jira ticket menu that requires an API token. To configure this:
+
+1. Create a `.chezmoi.toml` file in your home directory (not in this repository):
+   ```bash
+   # In your home directory (~/.chezmoi.toml)
+   [data]
+     jira_api_token = "your-actual-api-token-here"
+   ```
+
+2. Get your API token from [Atlassian's security settings](https://id.atlassian.com/manage-profile/security/api-tokens)
+
+3. Apply the configuration: `chezmoi apply`
+
+The API token will be securely templated into the Hammerspoon configuration without being stored in the repository.
+
 ## 🛠️ Troubleshooting
 
 ### Multiple config files error
